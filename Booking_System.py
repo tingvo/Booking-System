@@ -12,7 +12,11 @@ cursor.execute("CREATE TABLE IF NOT EXISTS drivers ('first_name' TEXT, 'last_nam
 cursor.execute("CREATE TABLE IF NOT EXISTS bookings ('driver' TEXT, 'date' TEXT, 'time' TEXT)")
 
 def submit():
-    pass
+    fname = fname_entry.get()
+    lname =lname_entry.get()
+    reg = reg_entry.get()
+    if fname == "First Name" or fname == "" or lname == "Last Name" or lname == "" or reg == "Car Registration Number" or reg == "":
+        messagebox.showerror("Error", "Please complete driver details")
 
 ## Widgets ##
 driverTitle = Label(root, text="Add driver:")
@@ -26,8 +30,14 @@ lname_entry = Entry(root)
 lname_entry.insert(0, "Last Name")
 lname_entry.grid(row=2, column=0)
 
+reg_entry = Entry(root)
+reg_entry.insert(0, "Car Registration Number")
+reg_entry.grid(row=3, column=0)
+
 submit_driver = Button(root, padx=60, text="Submit", command=submit)
-submit_driver.grid(row=3, column=0)
+submit_driver.grid(row=4, column=0)
+
+## End of Widgets ##
 
 conn.commit()
 root.mainloop()
