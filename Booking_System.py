@@ -14,7 +14,15 @@ cursor.execute("CREATE TABLE IF NOT EXISTS bookings ('driver' TEXT, 'date' TEXT,
 
 def set_drivers():
     global drivers
-    pass
+    global driver_names
+    cursor.execute("SELECT first_name, last_name FROM drivers")
+    drivers = cursor.fetchall()
+    for x in drivers:
+        driver_name = x[0] + " " + x[1]
+        driver_names.append(driver_name)
+    select_driver = ttk.Combobox(root, values=driver_names)
+    select_driver.set("Select a Driver")
+    select_driver.grid(row=5, column=0)
 
 def submit():
     fname = fname_entry.get()
@@ -25,6 +33,8 @@ def submit():
     else:
         driver_details = fname, lname, reg
         cursor.execute("INSERT INTO drivers VALUES (?,?,?)", driver_details)
+        conn.commit()
+        set_drivers()
         messagebox.showinfo("Success", "Details submitted successfully")
 
 def day_sel():
@@ -42,6 +52,7 @@ def time_sel():
     global time_slots
     global select_time
     s_time = time_slots.get(ACTIVE)
+    messagebox.showinfo("Details", s_day + ", " + s_time)
 
 ## Widgets ##
 driverTitle = Label(root, text="Add driver:")
@@ -62,9 +73,8 @@ reg_entry.grid(row=3, column=0)
 submit_driver = Button(root, padx=60, text="Submit", command=submit)
 submit_driver.grid(row=4, column=0)
 
-select_driver = ttk.Combobox(root)
-select_driver.set("Select a Driver")
-select_driver.grid(row=5, column=0)
+driver_names = []
+set_drivers()
 
 day_slots = Listbox()
 days = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]
