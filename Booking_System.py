@@ -6,15 +6,17 @@ import calendar
 import datetime
 
 root = Tk()
+root.title("Booking System")
 conn = sqlite3.connect("bookings.db")
 cursor = conn.cursor()
 
 cursor.execute("CREATE TABLE IF NOT EXISTS drivers ('first_name' TEXT, 'last_name' TEXT, 'car_reg' TEXT)")
-cursor.execute("CREATE TABLE IF NOT EXISTS bookings ('driver' TEXT, 'date' TEXT, 'time' TEXT, 'car_reg' TEXT)")
+cursor.execute("CREATE TABLE IF NOT EXISTS bookings ('driver' TEXT, 'date' TEXT, 'time' TEXT)")
 
 def set_drivers():
     global drivers
     global driver_names
+    global select_driver
     cursor.execute("SELECT first_name, last_name FROM drivers")
     drivers = cursor.fetchall()
     for x in drivers:
@@ -52,7 +54,15 @@ def time_sel():
     global time_slots
     global select_time
     s_time = time_slots.get(ACTIVE)
-    messagebox.showinfo("Details", s_day + ", " + s_time)
+    s_driver = select_driver.get()
+    if s_driver == "Select a Driver":
+        messagebox.showerror("Error", "Please select a driver")
+    else:
+        choice = messagebox.askyesno("Details", "Are these the correct details for the booking?\n\n" + s_driver + ", " + s_day + ", " + s_time)
+        if choice == True:
+            booking = s_driver, s_day, s_time
+            cursor.execute("INSERT INTO bookings VALUES (?,?,?)", booking)
+            messagebox.showinfo("Booking Confirmed", "Confirmed Booking:\n\n" + s_driver + ", " + s_day + ", " + s_time)
 
 ## Widgets ##
 driverTitle = Label(root, text="Add driver:")
