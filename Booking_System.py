@@ -10,7 +10,11 @@ conn = sqlite3.connect("bookings.db")
 cursor = conn.cursor()
 
 cursor.execute("CREATE TABLE IF NOT EXISTS drivers ('first_name' TEXT, 'last_name' TEXT, 'car_reg' TEXT)")
-cursor.execute("CREATE TABLE IF NOT EXISTS bookings ('driver' TEXT, 'date' TEXT, 'time' TEXT)")
+cursor.execute("CREATE TABLE IF NOT EXISTS bookings ('driver' TEXT, 'date' TEXT, 'time' TEXT, 'car_reg' TEXT)")
+
+def set_drivers():
+    global drivers
+    pass
 
 def submit():
     fname = fname_entry.get()
@@ -24,16 +28,20 @@ def submit():
         messagebox.showinfo("Success", "Details submitted successfully")
 
 def day_sel():
-    #global s_day
+    global s_day
     global day_slots
     global select_day
+    s_day = day_slots.get(ACTIVE)
     day_slots.destroy()
     select_day.destroy()
     time_slots.grid(row=0, column=1, rowspan=5)
     select_time.grid(row=5, column=1)
 
 def time_sel():
-    pass
+    global s_time
+    global time_slots
+    global select_time
+    s_time = time_slots.get(ACTIVE)
 
 ## Widgets ##
 driverTitle = Label(root, text="Add driver:")
@@ -54,15 +62,19 @@ reg_entry.grid(row=3, column=0)
 submit_driver = Button(root, padx=60, text="Submit", command=submit)
 submit_driver.grid(row=4, column=0)
 
+select_driver = ttk.Combobox(root)
+select_driver.set("Select a Driver")
+select_driver.grid(row=5, column=0)
+
 day_slots = Listbox()
 days = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]
 for day in days:
     day_slots.insert(END, day)
-day_slots.grid(row=0, column=1, rowspan=4)
+day_slots.grid(row=0, column=1, rowspan=5)
 Scrollbar(day_slots, orient="vertical")
 
 select_day = Button(root, padx=45, text="Select Day", command=day_sel)
-select_day.grid(row=4, column=1)
+select_day.grid(row=5, column=1)
 
 time_slots = Listbox()
 times = ["09:00am","09:30am","10:00am","10:30am","11:00am","11:30am","12:00pm",
