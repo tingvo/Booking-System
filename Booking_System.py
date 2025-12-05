@@ -62,7 +62,25 @@ def time_sel():
         if choice == True:
             booking = s_driver, s_day, s_time
             cursor.execute("INSERT INTO bookings VALUES (?,?,?)", booking)
+            conn.commit()
+            show_bookings()
             messagebox.showinfo("Booking Confirmed", "Confirmed Booking:\n\n" + s_driver + ", " + s_day + ", " + s_time)
+
+def show_bookings():
+    global accounts
+    global acc_sel
+    cursor.execute("SELECT date, time FROM bookings")
+    bookings = cursor.fetchall()
+    pres_bookings = Listbox(root)
+    for booking in bookings:
+        pres_bookings.insert(END, booking)
+        pres_bookings.grid(row=0, column=2, rowspan=5)
+    Scrollbar(pres_bookings, orient="vertical")
+
+def edit_booking():
+    pass
+
+show_bookings()
 
 ## Widgets ##
 driverTitle = Label(root, text="Add driver:")
@@ -104,6 +122,9 @@ for time in times:
 Scrollbar(time_slots, orient="vertical")
 
 select_time = Button(root, padx=40, text="Select Time", command=time_sel)
+
+edit_button = Button(root, padx=40, text="Edit Booking", command=edit_booking)
+edit_button.grid(row=5, column=2)
 ## End of Widgets ##
 
 conn.commit()
