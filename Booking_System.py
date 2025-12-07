@@ -37,15 +37,24 @@ def add_driver():
     reg_entry.insert(0, "Car Registration Number")
     reg_entry.grid(row=3, column=0)
 
-    submit_driver = Button(top, padx=60, text="Submit", command=submit)
+    submit_driver = Button(top, padx=60, text="Submit", command=func_subDr)
     submit_driver.grid(row=4, column=0)
 
 
 def add_client():
+    global fname_entry
+    global lname_entry
+    global line1Entry
+    global line2Entry
+    global line3Entry
+    global pcEntry
+    global phone_entry
+    global dis_entry
+    global top
     top = Toplevel()
     top.title("Add a new client")
-    driverTitle = Label(top, text="Add client:")
-    driverTitle.grid(row=0, column=0)
+    clientTitle = Label(top, text="Add client:")
+    clientTitle.grid(row=0, column=0)
 
     fname_entry = Entry(top)
     fname_entry.insert(0, "First Name")
@@ -70,17 +79,17 @@ def add_client():
     pcEntry.grid(row=7, column=0)
     placeholder = Label(top, text="").grid(row=8, column=0)
 
-    reg_entry = Entry(top)
-    reg_entry.insert(0, "Phone Number")
-    reg_entry.grid(row=9, column=0)
+    phone_entry = Entry(top)
+    phone_entry.insert(0, "Phone Number")
+    phone_entry.grid(row=9, column=0)
 
     yesno = ["Yes", "No"]
-    disability = ttk.Combobox(top, values=yesno)
-    disability.set("Disability Support Required")
-    disability.grid(row=10, column=0)
+    dis_entry = ttk.Combobox(top, values=yesno)
+    dis_entry.set("Disability Support Required")
+    dis_entry.grid(row=10, column=0)
 
-    submit_driver = Button(top, padx=60, text="Submit", command=submit)
-    submit_driver.grid(row=11, column=0)
+    submit_client = Button(top, padx=60, text="Submit", command=func_subCl)
+    submit_client.grid(row=11, column=0)
 
 
 def make_booking():
@@ -139,17 +148,42 @@ def set_clients(top):
     select_client.grid(row=1, column=0)
     pass
 
-def submit():
+def func_subDr():
     fname = fname_entry.get()
     lname =lname_entry.get()
     reg = reg_entry.get()
-    if fname == "First Name" or fname == "" or lname == "Last Name" or lname == "" or reg == "Car Registration Number" or reg == "":
+    incorrect = [fname == "First Name", fname == "", lname == "Last Name", 
+                 lname == "", reg == "Car Registration Number", reg == ""]
+    if any(incorrect):
         messagebox.showerror("Error", "Please complete driver details")
     else:
         driver_details = fname, lname, reg
         cursor.execute("INSERT INTO drivers VALUES (?,?,?)", driver_details)
         conn.commit()
         set_drivers(top)
+        top.destroy()
+        messagebox.showinfo("Success", "Details submitted successfully")
+
+def func_subCl():
+    fname = fname_entry.get()
+    lname = lname_entry.get()
+    line1 = line1Entry.get()
+    line2 = line2Entry.get()
+    line3 = line3Entry.get()
+    postcode = pcEntry.get()
+    phone = phone_entry.get()
+    disability = dis_entry.get()
+    incorrect = [fname == "First Name", fname == "", lname == "Last Name", lname == "", 
+                 line1 == "", line2 == "", line3 == "", postcode == "", phone == "Phone Number", 
+                 phone == "", disability == "Disability Support Required"]
+    if any(incorrect):
+        messagebox.showerror("Error", "Please complete client details")
+    else:
+        address = line1 + ", " + line2 + ", " + line3 + ", " + postcode
+        client_details = fname, lname, address, phone, disability
+        cursor.execute("INSERT INTO clients VALUES (?,?,?,?,?)", client_details)
+        conn.commit()
+        set_clients(top)
         top.destroy()
         messagebox.showinfo("Success", "Details submitted successfully")
         
