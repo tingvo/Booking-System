@@ -143,7 +143,7 @@ def set_clients(top):
     for x in clients:
         client_name = x[0] + " " + x[1]
         client_names.append(client_name)
-    select_client = ttk.Combobox(top, values=driver_names)
+    select_client = ttk.Combobox(top, values=client_names)
     select_client.set("Select a Client")
     select_client.grid(row=1, column=0)
     pass
