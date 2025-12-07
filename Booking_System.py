@@ -11,7 +11,75 @@ conn = sqlite3.connect("bookings.db")
 cursor = conn.cursor()
 
 cursor.execute("CREATE TABLE IF NOT EXISTS drivers ('first_name' TEXT, 'last_name' TEXT, 'car_reg' TEXT)")
+cursor.execute("""CREATE TABLE IF NOT EXISTS clients 
+               ('first_name' TEXT, 'last_name' TEXT, 'address' TEXT, phone_number TEXT, 'disability_support' TEXT)""")
 cursor.execute("CREATE TABLE IF NOT EXISTS bookings ('driver' TEXT, 'date' TEXT, 'time' TEXT)")
+
+def add_driver():
+    global fname_entry
+    global lname_entry
+    global reg_entry
+    top = Toplevel()
+    top.title("Add a new driver")
+    driverTitle = Label(top, text="Add driver:")
+    driverTitle.grid(row=0, column=0)
+
+    fname_entry = Entry(top)
+    fname_entry.insert(0, "First Name")
+    fname_entry.grid(row=1, column=0)
+
+    lname_entry = Entry(top)
+    lname_entry.insert(0, "Last Name")
+    lname_entry.grid(row=2, column=0)
+
+    reg_entry = Entry(top)
+    reg_entry.insert(0, "Car Registration Number")
+    reg_entry.grid(row=3, column=0)
+
+    submit_driver = Button(top, padx=60, text="Submit", command=submit)
+    submit_driver.grid(row=4, column=0)
+
+def add_client():
+    top = Toplevel()
+    top.title("Add a new client")
+    driverTitle = Label(top, text="Add client:")
+    driverTitle.grid(row=0, column=0)
+
+    fname_entry = Entry(top)
+    fname_entry.insert(0, "First Name")
+    fname_entry.grid(row=1, column=0)
+
+    lname_entry = Entry(top)
+    lname_entry.insert(0, "Last Name")
+    lname_entry.grid(row=2, column=0)
+    
+    line1Label = Label(top, text="Address:").grid(row=3, column=0)
+    line1Entry = Entry(top)
+    line1Entry.insert(0, "Line 1")
+    line1Entry.grid(row=4, column=0)
+    line2Entry = Entry(top)
+    line2Entry.insert(0, "Line 2")
+    line2Entry.grid(row=5, column=0)
+    line3Entry = Entry(top)
+    line3Entry.insert(0, "Line 3")
+    line3Entry.grid(row=6, column=0)
+    pcEntry = Entry(top)
+    pcEntry.insert(0, "Post Code")
+    pcEntry.grid(row=7, column=0)
+    placeholder = Label(top, text="").grid(row=8, column=0)
+
+    reg_entry = Entry(top)
+    reg_entry.insert(0, "Phone Number")
+    reg_entry.grid(row=9, column=0)
+
+    yesno = ["Yes", "No"]
+    disability = ttk.Combobox(top, values=yesno)
+    disability.set("Disability Support Required")
+    disability.grid(row=10, column=0)
+
+    submit_driver = Button(top, padx=60, text="Submit", command=submit)
+    submit_driver.grid(row=11, column=0)
+
 
 def set_drivers():
     global drivers
@@ -83,23 +151,11 @@ def edit_booking():
 show_bookings()
 
 ## Widgets ##
-driverTitle = Label(root, text="Add driver:")
-driverTitle.grid(row=0, column=0)
+drivers_button = Button(root, text="Add new driver details", command=add_driver)
+drivers_button.grid(row=0, column=0)
 
-fname_entry = Entry(root)
-fname_entry.insert(0, "First Name")
-fname_entry.grid(row=1, column=0)
-
-lname_entry = Entry(root)
-lname_entry.insert(0, "Last Name")
-lname_entry.grid(row=2, column=0)
-
-reg_entry = Entry(root)
-reg_entry.insert(0, "Car Registration Number")
-reg_entry.grid(row=3, column=0)
-
-submit_driver = Button(root, padx=60, text="Submit", command=submit)
-submit_driver.grid(row=4, column=0)
+client_button = Button(root, text="Add new client details", command=add_client)
+client_button.grid(row=1, column=0)
 
 driver_names = []
 set_drivers()
