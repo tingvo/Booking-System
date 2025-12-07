@@ -19,6 +19,7 @@ def add_driver():
     global fname_entry
     global lname_entry
     global reg_entry
+    global top
     top = Toplevel()
     top.title("Add a new driver")
     driverTitle = Label(top, text="Add driver:")
@@ -38,6 +39,7 @@ def add_driver():
 
     submit_driver = Button(top, padx=60, text="Submit", command=submit)
     submit_driver.grid(row=4, column=0)
+
 
 def add_client():
     top = Toplevel()
@@ -81,7 +83,36 @@ def add_client():
     submit_driver.grid(row=11, column=0)
 
 
-def set_drivers():
+def make_booking():
+    global day_slots
+    global select_day
+    global time_slots
+    global select_time
+    top = Toplevel()
+    set_drivers(top)
+    set_clients(top)
+    top.title("Make a booking")
+    day_slots = Listbox(top)
+    days = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]
+    for day in days:
+        day_slots.insert(END, day)
+    day_slots.grid(row=0, column=1, rowspan=5)
+    Scrollbar(day_slots, orient="vertical")
+
+    select_day = Button(top, padx=45, text="Select Day", command=day_sel)
+    select_day.grid(row=5, column=1)
+
+    time_slots = Listbox(top)
+    times = ["09:00am","09:30am","10:00am","10:30am","11:00am","11:30am","12:00pm",
+         "12:30pm","13:00pm","13:30pm","14:00pm","14:30pm","15:00pm","15:30pm"]
+    for time in times:
+        time_slots.insert(END, time)
+    Scrollbar(time_slots, orient="vertical")
+
+    select_time = Button(top, padx=40, text="Select Time", command=time_sel)
+
+
+def set_drivers(top):
     global drivers
     global driver_names
     global select_driver
@@ -90,9 +121,23 @@ def set_drivers():
     for x in drivers:
         driver_name = x[0] + " " + x[1]
         driver_names.append(driver_name)
-    select_driver = ttk.Combobox(root, values=driver_names)
+    select_driver = ttk.Combobox(top, values=driver_names)
     select_driver.set("Select a Driver")
-    select_driver.grid(row=5, column=0)
+    select_driver.grid(row=0, column=0)
+
+def set_clients(top):
+    global clients
+    global client_names
+    global select_client
+    cursor.execute("SELECT first_name, last_name FROM clients")
+    clients = cursor.fetchall()
+    for x in clients:
+        client_name = x[0] + " " + x[1]
+        client_names.append(client_name)
+    select_client = ttk.Combobox(top, values=driver_names)
+    select_client.set("Select a Client")
+    select_client.grid(row=1, column=0)
+    pass
 
 def submit():
     fname = fname_entry.get()
@@ -104,8 +149,10 @@ def submit():
         driver_details = fname, lname, reg
         cursor.execute("INSERT INTO drivers VALUES (?,?,?)", driver_details)
         conn.commit()
-        set_drivers()
+        set_drivers(top)
+        top.destroy()
         messagebox.showinfo("Success", "Details submitted successfully")
+        
 
 def day_sel():
     global s_day
@@ -142,46 +189,32 @@ def show_bookings():
     pres_bookings = Listbox(root)
     for booking in bookings:
         pres_bookings.insert(END, booking)
-        pres_bookings.grid(row=0, column=2, rowspan=5)
+        pres_bookings.grid(row=0, column=1, rowspan=5)
     Scrollbar(pres_bookings, orient="vertical")
 
 def edit_booking():
     pass
 
+driver_names = []
+client_names = []
+
+## Home Widgets ##
 show_bookings()
 
-## Widgets ##
-drivers_button = Button(root, text="Add new driver details", command=add_driver)
-drivers_button.grid(row=0, column=0)
+optionsLabel = Label(root, text="Options:").grid(row=0, column=0)
 
-client_button = Button(root, text="Add new client details", command=add_client)
-client_button.grid(row=1, column=0)
+drivers_button = Button(root, padx=10, text="Add new driver details", command=add_driver)
+drivers_button.grid(row=1, column=0)
 
-driver_names = []
-set_drivers()
-
-day_slots = Listbox()
-days = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]
-for day in days:
-    day_slots.insert(END, day)
-day_slots.grid(row=0, column=1, rowspan=5)
-Scrollbar(day_slots, orient="vertical")
-
-select_day = Button(root, padx=45, text="Select Day", command=day_sel)
-select_day.grid(row=5, column=1)
-
-time_slots = Listbox()
-times = ["09:00am","09:30am","10:00am","10:30am","11:00am","11:30am","12:00pm",
-         "12:30pm","13:00pm","13:30pm","14:00pm","14:30pm","15:00pm","15:30pm"]
-for time in times:
-    time_slots.insert(END, time)
-Scrollbar(time_slots, orient="vertical")
-
-select_time = Button(root, padx=40, text="Select Time", command=time_sel)
+client_button = Button(root, padx=10, text="Add new client details", command=add_client)
+client_button.grid(row=2, column=0)
 
 edit_button = Button(root, padx=40, text="Edit Booking", command=edit_booking)
-edit_button.grid(row=5, column=2)
-## End of Widgets ##
+edit_button.grid(row=5, column=1)
+
+book_button = Button(root, padx=15, text="Make a new booking", command=make_booking)
+book_button.grid(row=5, column=0)
+## End of Home Widgets ##
 
 conn.commit()
 root.mainloop()
