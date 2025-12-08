@@ -14,7 +14,9 @@ def get_week():
     week = [d.isoformat() for d in create_week()]
     return week
 
-def inPast(day):
+def inPast(dayx):
+    date_format = '%Y-%m-%d'
+    day = date.strptime(dayx, date_format)
     if day < date.today():
         return True
     else:

@@ -18,10 +18,11 @@ driver_names = []
 client_names = []
 week = get_week()
 
+#Deletes expired bookings
 cursor.execute("SELECT date FROM bookings")
 dates = cursor.fetchall()
 for day in dates:
-    if inPast(day) == True:
+    if inPast(day[0]) == True:
         cursor.execute("DELETE FROM bookings WHERE date=?", day)
     else:
         pass
@@ -225,8 +226,6 @@ def time_sel():
             messagebox.showinfo("Booking Confirmed", "Confirmed Booking:\n\n" + s_driver + ", " + s_day + ", " + s_time)
 
 def show_bookings():
-    global accounts
-    global acc_sel
     cursor.execute("SELECT date, time FROM bookings")
     bookings = cursor.fetchall()
     pres_bookings = Listbox(root)
