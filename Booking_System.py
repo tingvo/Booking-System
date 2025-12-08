@@ -2,8 +2,7 @@ import sqlite3
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
-import calendar
-import datetime
+from timemanager import *
 
 root = Tk()
 root.title("Booking System")
@@ -14,6 +13,10 @@ cursor.execute("CREATE TABLE IF NOT EXISTS drivers ('first_name' TEXT, 'last_nam
 cursor.execute("""CREATE TABLE IF NOT EXISTS clients 
                ('first_name' TEXT, 'last_name' TEXT, 'address' TEXT, phone_number TEXT, 'disability_support' TEXT)""")
 cursor.execute("CREATE TABLE IF NOT EXISTS bookings ('driver' TEXT, 'date' TEXT, 'time' TEXT)")
+
+driver_names = []
+client_names = []
+week = get_week()
 
 def add_driver():
     global fname_entry
@@ -102,8 +105,7 @@ def make_booking():
     set_clients(top)
     top.title("Make a booking")
     day_slots = Listbox(top)
-    days = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]
-    for day in days:
+    for day in week:
         day_slots.insert(END, day)
     day_slots.grid(row=0, column=1, rowspan=5)
     Scrollbar(day_slots, orient="vertical")
@@ -146,7 +148,6 @@ def set_clients(top):
     select_client = ttk.Combobox(top, values=client_names)
     select_client.set("Select a Client")
     select_client.grid(row=1, column=0)
-    pass
 
 def func_subDr():
     fname = fname_entry.get()
@@ -228,9 +229,6 @@ def show_bookings():
 
 def edit_booking():
     pass
-
-driver_names = []
-client_names = []
 
 ## Home Widgets ##
 show_bookings()
