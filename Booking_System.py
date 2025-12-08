@@ -2,7 +2,7 @@ import sqlite3
 from tkinter import *
 from tkinter import ttk
 from tkinter import messagebox
-from timemanager import *
+from datemanager import *
 
 root = Tk()
 root.title("Booking System")
@@ -17,6 +17,14 @@ cursor.execute("CREATE TABLE IF NOT EXISTS bookings ('driver' TEXT, 'date' TEXT,
 driver_names = []
 client_names = []
 week = get_week()
+
+cursor.execute("SELECT date FROM bookings")
+dates = cursor.fetchall()
+for day in dates:
+    if inPast(day) == True:
+        cursor.execute("DELETE FROM bookings WHERE date=?", day)
+    else:
+        pass
 
 def add_driver():
     global fname_entry
@@ -224,8 +232,11 @@ def show_bookings():
     pres_bookings = Listbox(root)
     for booking in bookings:
         pres_bookings.insert(END, booking)
-        pres_bookings.grid(row=0, column=1, rowspan=5)
+        pres_bookings.grid(row=0, column=1, rowspan=4)
     Scrollbar(pres_bookings, orient="vertical")
+
+def show_details():
+    pass
 
 def edit_booking():
     pass
@@ -241,11 +252,16 @@ drivers_button.grid(row=1, column=0)
 client_button = Button(root, padx=10, text="Add new client details", command=add_client)
 client_button.grid(row=2, column=0)
 
-edit_button = Button(root, padx=40, text="Edit Booking", command=edit_booking)
-edit_button.grid(row=5, column=1)
-
 book_button = Button(root, padx=15, text="Make a new booking", command=make_booking)
-book_button.grid(row=5, column=0)
+book_button.grid(row=3, column=0)
+
+edit_button = Button(root, padx=40, text="Edit booking", command=edit_booking)
+edit_button.grid(row=4, column=0)
+
+details_button = Button(root, padx=10, text="Show booking details", command=show_details)
+details_button.grid(row=4, column=1)
+
+
 ## End of Home Widgets ##
 
 conn.commit()
