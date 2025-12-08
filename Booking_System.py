@@ -9,10 +9,10 @@ root.title("Booking System")
 conn = sqlite3.connect("bookings.db")
 cursor = conn.cursor()
 
-cursor.execute("CREATE TABLE IF NOT EXISTS drivers ('first_name' TEXT, 'last_name' TEXT, 'car_reg' TEXT)")
+cursor.execute("CREATE TABLE IF NOT EXISTS drivers ('first_name' TEXT, 'last_name' TEXT, 'phone_number' TEXT)")
 cursor.execute("""CREATE TABLE IF NOT EXISTS clients 
                ('first_name' TEXT, 'last_name' TEXT, 'address' TEXT, phone_number TEXT, 'disability_support' TEXT)""")
-cursor.execute("CREATE TABLE IF NOT EXISTS bookings ('driver' TEXT, 'date' TEXT, 'time' TEXT)")
+cursor.execute("CREATE TABLE IF NOT EXISTS bookings ('driver' TEXT, 'client' TEXT, 'date' TEXT, 'time' TEXT)")
 
 driver_names = []
 client_names = []
@@ -30,7 +30,7 @@ for day in dates:
 def add_driver():
     global fname_entry
     global lname_entry
-    global reg_entry
+    global phone_entry
     global top
     top = Toplevel()
     top.title("Add a new driver")
@@ -45,9 +45,9 @@ def add_driver():
     lname_entry.insert(0, "Last Name")
     lname_entry.grid(row=2, column=0)
 
-    reg_entry = Entry(top)
-    reg_entry.insert(0, "Car Registration Number")
-    reg_entry.grid(row=3, column=0)
+    phone_entry = Entry(top)
+    phone_entry.insert(0, "Phone Number")
+    phone_entry.grid(row=3, column=0)
 
     submit_driver = Button(top, padx=60, text="Submit", command=func_subDr)
     submit_driver.grid(row=4, column=0)
@@ -109,6 +109,7 @@ def make_booking():
     global select_day
     global time_slots
     global select_time
+    global top
     top = Toplevel()
     set_drivers(top)
     set_clients(top)
@@ -161,13 +162,13 @@ def set_clients(top):
 def func_subDr():
     fname = fname_entry.get()
     lname =lname_entry.get()
-    reg = reg_entry.get()
+    phone = phone_entry.get()
     incorrect = [fname == "First Name", fname == "", lname == "Last Name", 
-                 lname == "", reg == "Car Registration Number", reg == ""]
+                 lname == "", phone == "Phone Number", phone == ""]
     if any(incorrect):
         messagebox.showerror("Error", "Please complete driver details")
     else:
-        driver_details = fname, lname, reg
+        driver_details = fname, lname, phone
         cursor.execute("INSERT INTO drivers VALUES (?,?,?)", driver_details)
         conn.commit()
         set_drivers(top)
@@ -214,16 +215,22 @@ def time_sel():
     global select_time
     s_time = time_slots.get(ACTIVE)
     s_driver = select_driver.get()
-    if s_driver == "Select a Driver":
+    s_client = select_client.get
+    if s_driver == "Select a Driver" and s_client == "Select a Client":
+        messagebox.showerror("Error", "Please select a driver and client")
+    elif s_driver == "Select a Driver":
         messagebox.showerror("Error", "Please select a driver")
+    elif s_client == "Select a Client":
+        messagebox.showerror("Error", "Please select a client")
     else:
         choice = messagebox.askyesno("Details", "Are these the correct details for the booking?\n\n" + s_driver + ", " + s_day + ", " + s_time)
         if choice == True:
-            booking = s_driver, s_day, s_time
-            cursor.execute("INSERT INTO bookings VALUES (?,?,?)", booking)
+            booking = s_driver, s_client, s_day, s_time
+            cursor.execute("INSERT INTO bookings VALUES (?,?,?,?)", booking)
             conn.commit()
             show_bookings()
-            messagebox.showinfo("Booking Confirmed", "Confirmed Booking:\n\n" + s_driver + ", " + s_day + ", " + s_time)
+            top.destroy()
+            messagebox.showinfo("Booking Confirmed", "Confirmed Booking:\n\n" + s_driver + ", " + s_client + ", " + s_day + ", " + s_time)
 
 def show_bookings():
     cursor.execute("SELECT date, time FROM bookings")
@@ -259,8 +266,6 @@ edit_button.grid(row=4, column=0)
 
 details_button = Button(root, padx=10, text="Show booking details", command=show_details)
 details_button.grid(row=4, column=1)
-
-
 ## End of Home Widgets ##
 
 conn.commit()
