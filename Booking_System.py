@@ -230,14 +230,16 @@ def time_sel():
     elif s_client == "Select a Client":
         messagebox.showerror("Error", "Please select a client")
     else:
-        choice = messagebox.askyesno("Details", "Are these the correct details for the booking?\n\n" + s_driver + ", " + s_day + ", " + s_time)
+        choice = messagebox.askyesno("Details", "Are these the correct details for the booking?\n\n" 
+                                     + s_driver + ", " + s_day + ", " + s_time)
         if choice == True:
             booking = s_driver, s_client, s_day, s_time
             cursor.execute("INSERT INTO bookings VALUES (?,?,?,?)", booking)
             conn.commit()
             show_bookings()
             top.destroy()
-            messagebox.showinfo("Booking Confirmed", "Confirmed Booking:\n\n" + s_driver + ", " + s_client + ", " + s_day + ", " + s_time)
+            messagebox.showinfo("Booking Confirmed", "Confirmed Booking:\n\n" 
+                                + s_driver + ", " + s_client + ", " + s_day + ", " + s_time)
 
 def show_bookings():
     global pres_bookings
@@ -248,6 +250,12 @@ def show_bookings():
         pres_bookings.insert(END, booking)
         pres_bookings.grid(row=0, column=1, rowspan=4)
     Scrollbar(pres_bookings, orient="vertical")
+
+def format_address(addressY):
+    address = ""
+    for addressZ in addressY:
+        address += " " + addressZ
+    return address
 
 def show_details():
     dateAndTime = pres_bookings.get(ACTIVE)
@@ -260,13 +268,14 @@ def show_details():
     client = clientx[0].split()
     cursor.execute("SELECT address FROM clients WHERE first_name=? AND last_name=?", (client[0], client[1]))
     addressx = cursor.fetchone()
-    address = addressx[0].split()
+    addressY = addressx[0].split()
+    address = format_address(addressY)
     cursor.execute("SELECT phone_number FROM clients WHERE first_name=? AND last_name=?", (client[0], client[1]))
     phone = cursor.fetchone()
     messagebox.showinfo("Booking Details", "Driver: " + details[0] + "\n\n" + "Client: " 
-                        + details[1] + "\n" + "Client Phone: " + phone[0] + "\n\n" + "Date: " + details[2] + "\n\n" + "Time: " + details[3] + "\n\n"
-                        + "Address: " + address[0] + " " + address[1] + " " + address[2] + " "  
-                        + address[3] + " " + address[4] + " " + address[5])
+                        + details[1] + "\n" + "Client Phone: " + phone[0] + "\n\n" + "Date: " 
+                        + details[2] + "\n\n" + "Time: " + details[3] + "\n\n"
+                        + "Address: " + address)
 
 def edit_booking():
     pass
