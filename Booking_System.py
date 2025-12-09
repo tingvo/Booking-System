@@ -204,42 +204,59 @@ def func_subCl():
         set_clients(top)
         top.destroy()
         messagebox.showinfo("Success", "Details submitted successfully")
-        
+
+def available(s_driverx):
+    cursor.execute("SELECT day_exceptions FROM drivers WHERE first_name=? AND last_name=?", (s_driverx[0], s_driverx[1]))
+    exceptions = cursor.fetchone()
+    if isDayException(s_day, exceptions):
+        messagebox.showerror("Error", "That driver is not available on that day")
+        return False
+    else:
+        return True
 
 def day_sel():
     global s_day
     global day_slots
     global select_day
+    global s_driver
+    global s_client
+    s_driver = select_driver.get()
+    s_client = select_client.get()
+    s_driverx = s_driver.split()
     s_day = day_slots.get(ACTIVE)
-    day_slots.destroy()
-    select_day.destroy()
-    time_slots.grid(row=0, column=1, rowspan=5)
-    select_time.grid(row=5, column=1)
+    boolDriver = False
+    boolClient = False
+    if s_driver == "Select a Driver" and s_client == "Select a Client":
+        messagebox.showerror("Error", "Please select a driver and client")
+        boolDriver = boolClient = False
+    elif s_driver == "Select a Driver":
+        messagebox.showerror("Error", "Please select a driver")
+        boolDriver = False
+    elif s_client == "Select a Client":
+        messagebox.showerror("Error", "Please select a client")
+        boolClient = False
+    else:
+        if available(s_driverx):
+            day_slots.destroy()
+            select_day.destroy()
+            time_slots.grid(row=0, column=1, rowspan=5)
+            select_time.grid(row=5, column=1)
 
 def time_sel():
     global s_time
     global time_slots
     global select_time
     s_time = time_slots.get(ACTIVE)
-    s_driver = select_driver.get()
-    s_client = select_client.get()
-    if s_driver == "Select a Driver" and s_client == "Select a Client":
-        messagebox.showerror("Error", "Please select a driver and client")
-    elif s_driver == "Select a Driver":
-        messagebox.showerror("Error", "Please select a driver")
-    elif s_client == "Select a Client":
-        messagebox.showerror("Error", "Please select a client")
-    else:
-        choice = messagebox.askyesno("Details", "Are these the correct details for the booking?\n\n" 
-                                     + s_driver + ", " + s_day + ", " + s_time)
-        if choice == True:
-            booking = s_driver, s_client, s_day, s_time
-            cursor.execute("INSERT INTO bookings VALUES (?,?,?,?)", booking)
-            conn.commit()
-            show_bookings()
-            top.destroy()
-            messagebox.showinfo("Booking Confirmed", "Confirmed Booking:\n\n" 
-                                + s_driver + ", " + s_client + ", " + s_day + ", " + s_time)
+    choice = messagebox.askyesno("Details", "Are these the correct details for the booking?\n\n" 
+                                 + s_driver + ", " + s_day + ", " + s_time)
+    if choice == True:
+        booking = s_driver, s_client, s_day, s_time
+        cursor.execute("INSERT INTO bookings VALUES (?,?,?,?)", booking)
+        conn.commit()
+        show_bookings()
+        top.destroy()
+        messagebox.showinfo("Booking Confirmed", "Confirmed Booking:\n\n" 
+                             + s_driver + ", " + s_client + ", " + s_day + ", " + s_time)
 
 def show_bookings():
     global pres_bookings
@@ -267,8 +284,8 @@ def show_details():
     clientx = cursor.fetchone()
     client = clientx[0].split()
     cursor.execute("SELECT address FROM clients WHERE first_name=? AND last_name=?", (client[0], client[1]))
-    addressx = cursor.fetchone()
-    addressY = addressx[0].split()
+    addressX = cursor.fetchone()
+    addressY = addressX[0].split()
     address = format_address(addressY)
     cursor.execute("SELECT phone_number FROM clients WHERE first_name=? AND last_name=?", (client[0], client[1]))
     phone = cursor.fetchone()

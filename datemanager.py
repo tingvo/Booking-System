@@ -1,5 +1,8 @@
 from datetime import date, timedelta
 
+date_format = '%Y-%m-%d'
+weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+
 def create_week():
     x = date.today()
     day_idx = (x.weekday())
@@ -15,10 +18,16 @@ def get_week():
     return week
 
 def inPast(dayx):
-    date_format = '%Y-%m-%d'
     day = date.strptime(dayx, date_format)
     if day < date.today():
         return True
     else:
         return False
 
+def isDayException(chosen_day, exceptionsx):
+    day = date.strptime(chosen_day, date_format)
+    exceptions = exceptionsx[0].split()
+    if weekdays[day.weekday()] in exceptions:
+        return True
+    else:
+        return False
