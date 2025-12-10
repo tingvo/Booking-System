@@ -5,9 +5,6 @@ weekdays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 
 
 def create_week():
     x = date.today()
-    day_idx = (x.weekday())
-    today = x - timedelta(days=day_idx)
-    x = today
     x += timedelta(days=1)
     for n in range(7):
         yield x
