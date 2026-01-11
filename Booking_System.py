@@ -117,8 +117,8 @@ def make_booking():
     global select_time
     global top
     top = Toplevel()
-    set_drivers(top)
-    set_clients(top)
+    set_drivers(top, "0")
+    set_clients(top, "0")
     top.title("Make a booking")
     day_slots = Listbox(top)
     for day in week:
@@ -139,30 +139,34 @@ def make_booking():
     select_time = Button(top, padx=40, text="Select Time", command=time_sel)
 
 
-def set_drivers(top):
+def set_drivers(top, current_dr):
     global drivers
     global driver_names
     global select_driver
+    if current_dr == "0":
+        current_dr = "Select a Driver"
     cursor.execute("SELECT first_name, last_name FROM drivers")
     drivers = cursor.fetchall()
     for x in drivers:
         driver_name = x[0] + " " + x[1]
         driver_names.append(driver_name)
     select_driver = ttk.Combobox(top, values=driver_names)
-    select_driver.set("Select a Driver")
+    select_driver.set(current_dr)
     select_driver.grid(row=0, column=0)
 
-def set_clients(top):
+def set_clients(top, current_cl):
     global clients
     global client_names
     global select_client
+    if current_cl == "0":
+        current_cl = "Select a Client"
     cursor.execute("SELECT first_name, last_name FROM clients")
     clients = cursor.fetchall()
     for x in clients:
         client_name = x[0] + " " + x[1]
         client_names.append(client_name)
     select_client = ttk.Combobox(top, values=client_names)
-    select_client.set("Select a Client")
+    select_client.set(current_cl)
     select_client.grid(row=1, column=0)
 
 def func_subDr():
@@ -295,7 +299,39 @@ def show_details():
                         + "Address: " + address)
 
 def edit_booking():
-    pass
+    global day_slots
+    global select_day
+    global time_slots
+    global select_time
+    global top
+    top = Toplevel()
+    dateAndTime = pres_bookings.get(ACTIVE)
+    date = dateAndTime[0]
+    time = dateAndTime[1]
+    cursor.execute("SELECT * FROM bookings WHERE date=? AND time=?", (date, time))
+    details = cursor.fetchone()
+    current_dr = details[0]
+    current_cl = details[1]
+    set_drivers(top, current_dr)
+    set_clients(top, current_cl)
+    top.title("Edit booking")
+    day_slots = Listbox(top)
+    for day in week:
+        day_slots.insert(END, day)
+    day_slots.grid(row=0, column=1, rowspan=5)
+    Scrollbar(day_slots, orient="vertical")
+    
+    select_day = Button(top, padx=45, text="Select Day", command=day_sel)
+    select_day.grid(row=5, column=1)
+
+    time_slots = Listbox(top)
+    times = ["09:00am","09:30am","10:00am","10:30am","11:00am","11:30am","12:00pm",
+         "12:30pm","13:00pm","13:30pm","14:00pm","14:30pm","15:00pm","15:30pm"]
+    for time in times:
+        time_slots.insert(END, time)
+    Scrollbar(time_slots, orient="vertical")
+
+    select_time = Button(top, padx=40, text="Select Time", command=time_sel)
 
 ## Home Widgets ##
 show_bookings()
