@@ -110,15 +110,25 @@ def add_client():
     submit_client.grid(row=11, column=0)
 
 
-def make_booking():
+def make_booking(state):
     global day_slots
     global select_day
     global time_slots
     global select_time
     global top
+    dateAndTime = pres_bookings.get(ACTIVE)
+    date = dateAndTime[0]
+    time = dateAndTime[1]
     top = Toplevel()
-    set_drivers(top, "0")
-    set_clients(top, "0")
+    if state == 0:
+        current_dr = current_cl = "0"
+    if state == 1:
+        cursor.execute("SELECT * FROM bookings WHERE date=? AND time=?", (date, time))
+        details = cursor.fetchone()
+        current_dr = details[0]
+        current_cl = details[1]
+    set_drivers(top, current_dr)
+    set_clients(top, current_cl)
     top.title("Make a booking")
     day_slots = Listbox(top)
     for day in week:
@@ -298,41 +308,6 @@ def show_details():
                         + details[2] + "\n\n" + "Time: " + details[3] + "\n\n"
                         + "Address: " + address)
 
-def edit_booking():
-    global day_slots
-    global select_day
-    global time_slots
-    global select_time
-    global top
-    top = Toplevel()
-    dateAndTime = pres_bookings.get(ACTIVE)
-    date = dateAndTime[0]
-    time = dateAndTime[1]
-    cursor.execute("SELECT * FROM bookings WHERE date=? AND time=?", (date, time))
-    details = cursor.fetchone()
-    current_dr = details[0]
-    current_cl = details[1]
-    set_drivers(top, current_dr)
-    set_clients(top, current_cl)
-    top.title("Edit booking")
-    day_slots = Listbox(top)
-    for day in week:
-        day_slots.insert(END, day)
-    day_slots.grid(row=0, column=1, rowspan=5)
-    Scrollbar(day_slots, orient="vertical")
-    
-    select_day = Button(top, padx=45, text="Select Day", command=day_sel)
-    select_day.grid(row=5, column=1)
-
-    time_slots = Listbox(top)
-    times = ["09:00am","09:30am","10:00am","10:30am","11:00am","11:30am","12:00pm",
-         "12:30pm","13:00pm","13:30pm","14:00pm","14:30pm","15:00pm","15:30pm"]
-    for time in times:
-        time_slots.insert(END, time)
-    Scrollbar(time_slots, orient="vertical")
-
-    select_time = Button(top, padx=40, text="Select Time", command=time_sel)
-
 ## Home Widgets ##
 show_bookings()
 
@@ -344,10 +319,10 @@ drivers_button.grid(row=1, column=0)
 client_button = Button(root, padx=10, text="Add new client details", command=add_client)
 client_button.grid(row=2, column=0)
 
-book_button = Button(root, padx=15, text="Make a new booking", command=make_booking)
+book_button = Button(root, padx=15, text="Make a new booking", command=lambda:make_booking(0))
 book_button.grid(row=3, column=0)
 
-edit_button = Button(root, padx=40, text="Edit booking", command=edit_booking)
+edit_button = Button(root, padx=40, text="Edit booking", command=lambda:make_booking(1))
 edit_button.grid(row=4, column=0)
 
 details_button = Button(root, padx=10, text="Show booking details", command=show_details)
