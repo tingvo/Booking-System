@@ -18,6 +18,8 @@ cursor.execute("CREATE TABLE IF NOT EXISTS bookings ('driver' TEXT, 'client' TEX
 driver_names = []
 client_names = []
 week = get_week()
+drivers_set = False
+clients_set = False
 
 #Deletes expired bookings
 cursor.execute("SELECT date FROM bookings")
@@ -109,8 +111,7 @@ def add_client():
     submit_client = Button(top, padx=60, text="Submit", command=func_subCl)
     submit_client.grid(row=11, column=0)
 
-
-def make_booking(state):
+def book_or_edit(state):
     global day_slots
     global select_day
     global time_slots
@@ -153,13 +154,17 @@ def set_drivers(top, current_dr):
     global drivers
     global driver_names
     global select_driver
+    global drivers_set
     if current_dr == "0":
         current_dr = "Select a Driver"
+    if drivers_set == True:
+        driver_names.clear()
     cursor.execute("SELECT first_name, last_name FROM drivers")
     drivers = cursor.fetchall()
     for x in drivers:
         driver_name = x[0] + " " + x[1]
         driver_names.append(driver_name)
+    drivers_set = True
     select_driver = ttk.Combobox(top, values=driver_names)
     select_driver.set(current_dr)
     select_driver.grid(row=0, column=0)
@@ -168,13 +173,17 @@ def set_clients(top, current_cl):
     global clients
     global client_names
     global select_client
+    global clients_set
     if current_cl == "0":
         current_cl = "Select a Client"
+    if clients_set == True:
+        client_names.clear()
     cursor.execute("SELECT first_name, last_name FROM clients")
     clients = cursor.fetchall()
     for x in clients:
         client_name = x[0] + " " + x[1]
         client_names.append(client_name)
+    clients_set = True
     select_client = ttk.Combobox(top, values=client_names)
     select_client.set(current_cl)
     select_client.grid(row=1, column=0)
@@ -192,7 +201,7 @@ def func_subDr():
         driver_details = fname, lname, phone, day_exc
         cursor.execute("INSERT INTO drivers VALUES (?,?,?,?)", driver_details)
         conn.commit()
-        set_drivers(top)
+        #set_drivers(top, "0")
         top.destroy()
         messagebox.showinfo("Success", "Details submitted successfully")
 
@@ -215,7 +224,7 @@ def func_subCl():
         client_details = fname, lname, address, phone, disability
         cursor.execute("INSERT INTO clients VALUES (?,?,?,?,?)", client_details)
         conn.commit()
-        set_clients(top)
+        #set_clients(top, "0")
         top.destroy()
         messagebox.showinfo("Success", "Details submitted successfully")
 
@@ -319,10 +328,10 @@ drivers_button.grid(row=1, column=0)
 client_button = Button(root, padx=10, text="Add new client details", command=add_client)
 client_button.grid(row=2, column=0)
 
-book_button = Button(root, padx=15, text="Make a new booking", command=lambda:make_booking(0))
+book_button = Button(root, padx=15, text="Make a new booking", command=lambda:book_or_edit(0))
 book_button.grid(row=3, column=0)
 
-edit_button = Button(root, padx=40, text="Edit booking", command=lambda:make_booking(1))
+edit_button = Button(root, padx=40, text="Edit booking", command=lambda:book_or_edit(1))
 edit_button.grid(row=4, column=0)
 
 details_button = Button(root, padx=10, text="Show booking details", command=show_details)
