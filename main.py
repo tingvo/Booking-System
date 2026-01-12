@@ -201,7 +201,6 @@ def func_subDr():
         driver_details = fname, lname, phone, day_exc
         cursor.execute("INSERT INTO drivers VALUES (?,?,?,?)", driver_details)
         conn.commit()
-        #set_drivers(top, "0")
         top.destroy()
         messagebox.showinfo("Success", "Details submitted successfully")
 
@@ -224,7 +223,6 @@ def func_subCl():
         client_details = fname, lname, address, phone, disability
         cursor.execute("INSERT INTO clients VALUES (?,?,?,?,?)", client_details)
         conn.commit()
-        #set_clients(top, "0")
         top.destroy()
         messagebox.showinfo("Success", "Details submitted successfully")
 
