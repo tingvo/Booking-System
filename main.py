@@ -245,17 +245,12 @@ def day_sel():
     s_client = select_client.get()
     s_driverx = s_driver.split()
     s_day = day_slots.get(ACTIVE)
-    boolDriver = False
-    boolClient = False
     if s_driver == "Select a Driver" and s_client == "Select a Client":
         messagebox.showerror("Error", "Please select a driver and client")
-        boolDriver = boolClient = False
     elif s_driver == "Select a Driver":
         messagebox.showerror("Error", "Please select a driver")
-        boolDriver = False
     elif s_client == "Select a Client":
         messagebox.showerror("Error", "Please select a client")
-        boolClient = False
     else:
         if available(s_driverx):
             day_slots.destroy()
